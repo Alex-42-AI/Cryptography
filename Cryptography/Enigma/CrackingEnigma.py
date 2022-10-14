@@ -135,7 +135,7 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                         rotors[1] = rotated(rotors[1])
                     rotors[2] = rotated(rotors[2])
 from time import time
-item = decrypt_military_enigma('jmlcnfvzmzemfdoxhucgairbhjk', 'testingencryption')  # testingencryptiondecryption
+item = decrypt_military_enigma('jmlcnfvzmzemfdoxhucgairbujk', 'testingencryption')  # testingencryptiondecryption
 t = time()
 for el in item:
     print(el)
