@@ -92,15 +92,44 @@ rotor4 = Rotor({'a': 'x', 'b': 't', 'c': 'k', 'd': 'a', 'e': 'z', 'f': 's', 'g':
 rotor5 = Rotor({'a': 'l', 'b': 'm', 'c': 'e', 'd': 'o', 'e': 'i', 'f': 'p', 'g': 'f', 'h': 'g', 'i': 'y', 'j': 's', 'k': 'b', 'l': 'r', 'm': 'k', 'n': 'h', 'o': 'j', 'p': 'u', 'q': 'd', 'r': 'q', 's': 'c', 't': 'v', 'u': 'a', 'v': 'n', 'w': 'x', 'x': 'w', 'y': 'z', 'z': 't'})
 all_rotors = [rotor1, rotor2, rotor3, rotor4, rotor5]
 reflector = [Pair('a', 'p'), Pair('h', 'l'), Pair('v', 'n'), Pair('s', 'z'), Pair('k', 'x'), Pair('e', 'b'), Pair('q', 'w'), Pair('j', 'm'), Pair('i', 'd'), Pair('o', 'c'), Pair('u', 'g'), Pair('t', 'f'), Pair('r', 'y')]
-Plugboard = [Pair('n', 'e'), Pair('l', 't'), Pair('y', 's'), Pair('d', 'v'), Pair('q', 'h'), Pair('p', 'c'), Pair('k', 'o'), Pair('r', 'm'), Pair('u', 'i'), Pair('g', 'f')]
-def encrypt(message: str, rotors: [Rotor, Rotor, Rotor], rotor1rotations: int, rotor2rotations: int, rotor3rotations: int, plugboard: [Pair]):
+def civil_encryption(message: str, rotors: [Rotor, Rotor, Rotor], rotor1rotations: int, rotor2rotations: int, rotor3rotations: int):
     for _ in range(rotor1rotations):
         rotors[0] = rotated(rotors[0])
     for _ in range(rotor2rotations):
         rotors[1] = rotated(rotors[1])
     for _ in range(rotor3rotations):
         rotors[2] = rotated(rotors[2])
-    res, total = '', 0
+    res, total = '', rotor1rotations % 26
+    for l in message:
+        if l.isalpha():
+            l = l.lower()
+            total += 1
+            rotors[0] = rotated(rotors[0])
+            if not total % 26:
+                rotors[1] = rotated(rotors[1])
+                if not total % 676:
+                    rotors[2] = rotated(rotors[2])
+            l = rotors[0][l]
+            l = rotors[1][l]
+            l = rotors[2][l]
+            for p in reflector:
+                if l in p:
+                    l = p.other(l)
+                    break
+            l = list(rotors[2].keys())[list(rotors[2].values()).index(l)]
+            l = list(rotors[1].keys())[list(rotors[1].values()).index(l)]
+            l = list(rotors[0].keys())[list(rotors[0].values()).index(l)]
+        res += l
+    return res
+Plugboard = [Pair('n', 'e'), Pair('l', 't'), Pair('y', 's'), Pair('d', 'v'), Pair('q', 'h'), Pair('p', 'c'), Pair('k', 'o'), Pair('r', 'm'), Pair('u', 'i'), Pair('g', 'f')]
+def military_encryption(message: str, rotors: [Rotor, Rotor, Rotor], rotor1rotations: int, rotor2rotations: int, rotor3rotations: int, plugboard: [Pair]):
+    for _ in range(rotor1rotations):
+        rotors[0] = rotated(rotors[0])
+    for _ in range(rotor2rotations):
+        rotors[1] = rotated(rotors[1])
+    for _ in range(rotor3rotations):
+        rotors[2] = rotated(rotors[2])
+    res, total = '', rotor1rotations % 26
     for l in message:
         if l.isalpha():
             l = l.lower()
@@ -131,4 +160,4 @@ def encrypt(message: str, rotors: [Rotor, Rotor, Rotor], rotor1rotations: int, r
         res += l
     return res
 if __name__ == "__main__":
-    print(encrypt('testingencryptiondecryption', [rotor1, rotor2, rotor4], 1, 1, 2, Plugboard))
+    print(military_encryption('testingencryptiondecryption', [rotor1, rotor2, rotor4], 1, 1, 2, Plugboard))  # jmlcnfvzmzemfdoxhucgairbujk
