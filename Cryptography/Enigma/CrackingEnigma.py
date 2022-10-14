@@ -1,4 +1,5 @@
-"""
+from itertools import permutations
+from Personal.Cryptography.Enigma.Enigma import Pair, all_rotors, reflector, rotated, encrypt
 def decrypt_civil_enigma(message: str, supposed_substring: str):
     for i in range(len(message) - len(supposed_substring) + 1):
         if all(supposed_substring[_] != message[i + _] for _ in range(len(supposed_substring))):
@@ -50,92 +51,7 @@ def decrypt_civil_enigma(message: str, supposed_substring: str):
                             rotors[0] = rotated(rotors[0])
                         rotors[1] = rotated(rotors[1])
                     rotors[2] = rotated(rotors[2])
-"""
-from itertools import permutations
-from Personal.Cryptography.Enigma.Enigma import Pair, all_rotors, reflector, rotated, encrypt
-# def _decrypt(message: str, supposed_substring: str):
-#     for rotors in map(list, permutations(all_rotors, 3)):
-#         print(all_rotors.index(rotors[0]), all_rotors.index(rotors[1]), all_rotors.index(rotors[2]))
-#         for ___ in range(26):
-#             for __ in range(26):
-#                 for _ in range(26):
-#                     for i in range(len(message) - len(supposed_substring) + 1):
-#                         if all(message[i + ii] != supposed_substring[ii] for ii in range(len(supposed_substring))):
-#                             poison_tree = []
-#                             curr_rotor_0, curr_rotor_1, curr_rotor_2 = rotors[0].copy(), rotors[1].copy(), rotors[2].copy()
-#                             for k, l0 in enumerate(alphabet):
-#                                 for l1 in alphabet[k + 1:]:
-#                                     pairs, singles = [Pair(l0, l1)], set()
-#                                     problem, total = False, i
-#                                     for j, l in enumerate(supposed_substring):
-#                                         if len(pairs) == 10:
-#                                             break
-#                                         for p in pairs:
-#                                             if l in p:
-#                                                 l = p.other(l)
-#                                                 break
-#                                         l = curr_rotor_0[l]
-#                                         l = curr_rotor_1[l]
-#                                         l = curr_rotor_2[l]
-#                                         for p in reflector:
-#                                             if l in p:
-#                                                 l = p.other(l)
-#                                                 break
-#                                         for _k, v in curr_rotor_2.items():
-#                                             if l == v:
-#                                                 l = _k
-#                                                 break
-#                                         for _k, v in curr_rotor_1.items():
-#                                             if l == v:
-#                                                 l = _k
-#                                                 break
-#                                         for _k, v in curr_rotor_0.items():
-#                                             if l == v:
-#                                                 l = _k
-#                                                 break
-#                                         if l != message[i + j] and Pair(l, message[i + j]) not in pairs:
-#                                             if len(pairs) == 10:
-#                                                 problem = True
-#                                                 poison_tree += [p for p in pairs if p not in poison_tree]
-#                                                 break
-#                                             if l in singles or message[i + j] in singles:
-#                                                 problem = True
-#                                                 poison_tree += [p for p in pairs if p not in poison_tree]
-#                                                 break
-#                                             for p in pairs:
-#                                                 if l in p or message[i + j] in p:
-#                                                     problem = True
-#                                                     break
-#                                             if problem:
-#                                                 poison_tree += [p for p in pairs + [Pair(l, message[i + j])] if p not in poison_tree]
-#                                                 break
-#                                             if Pair(l, message[i + j]) in poison_tree:
-#                                                 problem = True
-#                                                 poison_tree += [p for p in pairs if p not in poison_tree]
-#                                                 break
-#                                             pairs.append(Pair(l, message[i + j]))
-#                                         if l == message[i + j]:
-#                                             singles.add(l)
-#                                             if len(singles) == 7:
-#                                                 problem = True
-#                                                 poison_tree += [p for p in pairs if p not in poison_tree]
-#                                                 break
-#                                         total += 1
-#                                         curr_rotor_0.rotate()
-#                                         if not total % 26:
-#                                             curr_rotor_1.rotate()
-#                                             if not total % 676:
-#                                                 curr_rotor_2.rotate()
-#                                     if not problem:
-#                                         return ___, __, _, [curr_rotor_0, curr_rotor_1, curr_rotor_2], pairs
-#                                     if len(poison_tree) == 325:
-#                                         break
-#                                 if len(poison_tree) == 325:
-#                                     break
-#                     rotors[0].rotate()
-#                 rotors[1].rotate()
-#             rotors[2].rotate()
-def decrypt(message: str, supposed_substring: str):
+def decrypt_military_enigma(message: str, supposed_substring: str):
     def free(letter: str):
         for pair in pairs:
             if letter in pair:
@@ -219,8 +135,8 @@ def decrypt(message: str, supposed_substring: str):
                         rotors[1] = rotated(rotors[1])
                     rotors[2] = rotated(rotors[2])
 from time import time
-item = decrypt('jmlcnfvzmzemfdoxhucgairbhjk', 'testingencryption')
+item = decrypt_military_enigma('jmlcnfvzmzemfdoxhucgairbhjk', 'testingencryption')  # testingencryptiondecryption
 t = time()
 for el in item:
     print(el)
-# print(time() - t)
+print(time() - t)
