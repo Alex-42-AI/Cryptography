@@ -54,7 +54,7 @@ def decrypt_civil_enigma(message: str, supposed_substring: str):
 def decrypt_military_enigma(message: str, supposed_substring: str):
     def work_out_settings(current_substring: str, total: int, pairs=None, singles=None, poison_tree=None):
         if not current_substring:
-            return
+            yield f'{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {singles} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}'
         if poison_tree is None:
             poison_tree = []
         if singles is None:
@@ -121,10 +121,8 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
             poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs))
         else:
             singles.add(l)
-        if len(poison_tree) == 325:
+        if not works:
             return
-        if works:
-            yield f'{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {singles} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}'
         for _res in work_out_settings(current_substring[1:], total + 1, pairs, singles, poison_tree):
             yield _res
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
