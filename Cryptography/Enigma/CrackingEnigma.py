@@ -55,6 +55,8 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
     def work_out_settings(current_substring: str, total: int, pairs=None, singles=None, poison_tree=None):
         if not current_substring:
             yield f'{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {singles} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}'
+            return
+        print(current_substring)
         if poison_tree is None:
             poison_tree = []
         if singles is None:
@@ -75,10 +77,9 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                     if not free(other):
                         continue
                     _pairs.append(Pair(current_substring[0], other))
-                for _res in work_out_settings(supposed_substring, total, _pairs, _singles):
+                for _res in work_out_settings(current_substring, total, _pairs, _singles):
                     yield _res
             return
-        total += 1
         curr_curr_rotor_0.rotate()
         if not total % 26:
             curr_curr_rotor_1.rotate()
@@ -109,18 +110,20 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                 l = k
                 break
         works = True
-        if l != message[i]:
-            if Pair(l, message[i]) not in pairs:
-                if len(pairs) == 10 or Pair(l, message[i]) in poison_tree or not (free(l) and free(message[i])):
+        if l != message[i + total]:
+            if Pair(l, message[i + total]) not in pairs:
+                if len(pairs) == 10 or Pair(l, message[i + total]) in poison_tree or not (free(l) and free(message[i + total])):
                     works = False
-                    poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs + [Pair(l, message[i])]))
+                    poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs + [Pair(l, message[i + total])]))
                 else:
-                    pairs.append(Pair(l, message[i]))
+                    pairs.append(Pair(l, message[i + total]))
         elif len(singles) == 6 or any(Pair(l, _) in pairs for _ in list(filter(lambda _l: _l != l, alphabet))):
             works = False
             poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs))
         else:
             singles.add(l)
+        if len(poison_tree) > 315:
+            raise ValueError
         if not works:
             return
         for _res in work_out_settings(current_substring[1:], total + 1, pairs, singles, poison_tree):
@@ -142,8 +145,11 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                                     if not (_ + 1) % 676:
                                         curr_rotor_2 = rotated(curr_rotor_2)
                             curr_curr_rotor_0, curr_curr_rotor_1, curr_curr_rotor_2 = curr_rotor_0.copy(), curr_rotor_1.copy(), curr_rotor_2.copy()
-                            for res in work_out_settings(supposed_substring, i):
-                                yield res
+                            for res in work_out_settings(supposed_substring, i + 1):
+                                try:
+                                    yield res
+                                except ValueError:
+                                    pass
                             rotors[0] = rotated(rotors[0])
                         rotors[1] = rotated(rotors[1])
                     rotors[2] = rotated(rotors[2])
