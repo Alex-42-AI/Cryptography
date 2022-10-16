@@ -59,7 +59,7 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
         if pairs is None:
             pairs = []
         if free(current_substring[0]):
-            for other in ''.join(alphabet.split(current_substring[0])) + ' ':
+            for other in alphabet.replace(current_substring[0], ' '):
                 _pairs, _singles = pairs.copy(), singles.copy()
                 if other == ' ':
                     _singles.add(current_substring[0])
@@ -93,7 +93,7 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                     poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs + [Pair(l, message[i + total])]))
                 else:
                     pairs.append(Pair(l, message[i + total]))
-        elif len(singles) == 6 or any(Pair(l, _) in pairs for _ in list(filter(lambda _l: _l != l, alphabet))):
+        elif len(singles) == 6 or any(Pair(l, _) in pairs for _ in alphabet.replace(l, '')):
             works = False
             poison_tree += list(filter(lambda _p: _p not in poison_tree, pairs))
         else:
