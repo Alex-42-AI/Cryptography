@@ -50,7 +50,7 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                     return False
             return letter not in singles
         if not current_substring:
-            yield f'{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {singles} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}'
+            yield f'{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {''.join(filter(free, alphabet))} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}'
             return
         if poison_tree is None:
             poison_tree = []
