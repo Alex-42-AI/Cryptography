@@ -90,7 +90,7 @@ def civil_encryption(message: str, rotors: [Rotor], rotor1rotations: int, rotor2
         rotors[1] = rotated(rotors[1])
     for _ in range(rotor3rotations):
         rotors[2] = rotated(rotors[2])
-    res, total = '', rotor1rotations % 26
+    res, total = '', rotor1rotations % 26 + 26 * rotor2rotations
     for l in message.lower():
         if l.isalpha():
             total += 1
