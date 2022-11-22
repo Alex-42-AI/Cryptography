@@ -50,7 +50,7 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                     return False
             return letter not in singles
         if not current_substring:
-            yield f"{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {''.join(filter(free, alphabet))} -> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}"
+            yield f"{all_rotors.index(rotors[0]) + 1} {all_rotors.index(rotors[1]) + 1} {all_rotors.index(rotors[2]) + 1} | {rotor1rotations:02d} {rotor2rotations:02d} {rotor3rotations:02d} | {pairs} | {''.join(filter(free, alphabet))}" + ' ' * (not singles) + f"-> {military_encryption(message, rotors.copy(), 0, 0, 0, pairs)}"
             return
         if poison_tree is None:
             poison_tree = []
@@ -60,21 +60,19 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
             curr_pairs = []
         if pairs is None:
             pairs = []
+        if len(pairs) == 10:
+            singles.update({l for l in alphabet if free(l)})
         if free(current_substring[0]):
             for other in alphabet.replace(current_substring[0], ' '):
                 _pairs, _singles = pairs.copy(), singles.copy()
                 if other == ' ':
                     _singles.add(current_substring[0])
                 else:
-                    if not free(other):
+                    if not free(other) or Pair(current_substring[0], other) in poison_tree:
                         continue
                     _pairs.append(Pair(current_substring[0], other))
-                _poison_tree = poison_tree
-                for _res in work_out_settings(current_substring, rotor0, rotor1, rotor2, total, _pairs, [Pair(current_substring[0], other)], _singles, _poison_tree):
-                    try:
-                        yield _res
-                    except ValueError:
-                        pass
+                for _res in work_out_settings(current_substring, rotor0, rotor1, rotor2, total, _pairs, [Pair(current_substring[0], other)], _singles):
+                    yield _res
             return
         _rotor0, _rotor1, _rotor2 = rotor0.copy(), rotor1.copy(), rotor2.copy()
         _rotor0.rotate()
@@ -105,6 +103,8 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                     poison_tree += list(filter(lambda _p: _p not in poison_tree, curr_pairs + [Pair(l, message[i + total])]))
                 else:
                     pairs.append(Pair(l, message[i + total])), curr_pairs.append(Pair(l, message[i + total]))
+                    if len(pairs) == 10:
+                        singles.update({l for l in alphabet if free(l)})
         elif len(singles) == 6 or any(Pair(l, _) in pairs for _ in alphabet.replace(l, '')):
             works = False
             poison_tree += list(filter(lambda _p: _p not in poison_tree, curr_pairs))
@@ -133,15 +133,15 @@ def decrypt_military_enigma(message: str, supposed_substring: str):
                                     if not (_ + 1) % 676:
                                         curr_rotor_2 = rotated(curr_rotor_2)
                             curr_curr_rotor_0, curr_curr_rotor_1, curr_curr_rotor_2 = curr_rotor_0.copy(), curr_rotor_1.copy(), curr_rotor_2.copy()
-                            for res in work_out_settings(supposed_substring, curr_curr_rotor_0, curr_curr_rotor_1, curr_curr_rotor_2, i):
-                                try:
+                            try:
+                                for res in work_out_settings(supposed_substring, curr_curr_rotor_0, curr_curr_rotor_1, curr_curr_rotor_2, i):
                                     yield res
-                                except ValueError:
-                                    pass
+                            except ValueError:
+                                pass
                             rotors[0] = rotated(rotors[0])
                         rotors[1] = rotated(rotors[1])
                     rotors[2] = rotated(rotors[2])
-item = decrypt_military_enigma('nbwzwtsommuhheqxbuypdrnsutm', 'testingencryption')  # testingencryptiondecryption
+item = decrypt_military_enigma('nbwzwtsommuhheqxbuypdrnsutm', 'testingencryption')
 from time import time
 t = time()
 for el in item:
