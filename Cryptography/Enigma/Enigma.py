@@ -113,41 +113,12 @@ def civil_encryption(message: str, rotors: [Rotor], rotor1rotations: int, rotor2
     return res
 Plugboard = [Pair('n', 'e'), Pair('l', 't'), Pair('y', 's'), Pair('d', 'v'), Pair('q', 'h'), Pair('p', 'c'), Pair('k', 'o'), Pair('r', 'm'), Pair('u', 'i'), Pair('g', 'f')]
 def military_encryption(message: str, rotors: [Rotor], rotor1rotations: int, rotor2rotations: int, rotor3rotations: int, plugboard: [Pair]):
-    for _ in range(rotor1rotations):
-        rotors[0] = rotated(rotors[0])
-    for _ in range(rotor2rotations):
-        rotors[1] = rotated(rotors[1])
-    for _ in range(rotor3rotations):
-        rotors[2] = rotated(rotors[2])
-    res, total = '', rotor1rotations % 26
-    for l in message:
-        if l.isalpha():
-            l = l.lower()
-            total += 1
-            rotors[0] = rotated(rotors[0])
-            if not total % 26:
-                rotors[1] = rotated(rotors[1])
-                if not total % 676:
-                    rotors[2] = rotated(rotors[2])
-            for p in plugboard:
-                if l in p:
-                    l = p.other(l)
-                    break
-            l = rotors[0][ord(l) - 97]
-            l = rotors[1][ord(l) - 97]
-            l = rotors[2][ord(l) - 97]
-            for p in reflector:
-                if l in p:
-                    l = p.other(l)
-                    break
-            l = chr(rotors[2].index(l) + 97)
-            l = chr(rotors[1].index(l) + 97)
-            l = chr(rotors[0].index(l) + 97)
-            for p in plugboard:
-                if l in p:
-                    l = p.other(l)
-                    break
-        res += l
-    return res
+    res = list(civil_encryption(message, rotors, rotor1rotations, rotor2rotations, rotor3rotations))
+    for i in range(len(res)):
+        for p in plugboard:
+            if res[i] in p:
+                res[i] = p.other(res[i])
+                break
+    return ''.join(res)
 if __name__ == "__main__":
     print(military_encryption('testingencryptiondecryption', [rotor1, rotor2, rotor3], 1, 1, 2, Plugboard))  # nbwzwtsommuhheqxbuypdrnsutm
